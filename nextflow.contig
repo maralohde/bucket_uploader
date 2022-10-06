@@ -1,0 +1,51 @@
+manifest {
+    mainScript = 'poreCov.nf'
+    name = 'poreCov'
+}
+
+// default parameters
+params {
+    help = false
+    profile = false
+
+    // inputs
+    files = ''
+}
+
+// runinfo
+
+
+
+profiles {
+    local {
+        workDir = "work/nextflow-poreCov-$USER"
+        includeConfig 'configs/local.config'
+        executor {
+            name = "local"
+            cpus = params.max_cores
+            memory = params.memory
+        }
+
+        process.errorStrategy = 'ignore'
+    }
+
+    ukj_cloud { 
+        workDir = "/tmp/nextflow-bucket_upload-$USER"
+        bucketDir = 'gs://backup-case-mara/'
+        google {  
+            project = 'case-dev-302214'
+            zone = 'europe-west1-b,europe-west1-c,europe-west3-b,europe-west3-a,europe-west4-b,europe-west4-a'
+            lifeSciences.preemptible = true
+            lifeSciences.bootDiskSize = 20.GB
+            }
+        includeConfig 'configs/container.config'
+        includeConfig 'configs/nodes.config'
+
+        // cloud error strategy
+        process { 
+            errorStrategy = { task.exitStatus in [10,14,143,137,104,134,139] ? 'retry' : 'ignore' }
+            maxRetries = 3
+            executor = 'google-lifesciences'
+        }
+    }
+}
