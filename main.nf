@@ -1,6 +1,9 @@
 #!/usr/bin/env nextflow
+nextflow.enable.dsl=2
+
 
 log.info """\
+
  U P L O A D  T O  G O O G L E  C L O U D  B U C K E T
  =====================================================
  files        : ${params.files}
@@ -11,17 +14,24 @@ files_ch = Channel
 
 
 process file_upload {
-    executor = "local"
-    publishDir "gs://backup-case-mara/"
+    executor = "google-lifesciences"
+    publishDir "test/", mode: 'copy', pattern: "${data}"
 
     input:
-    file files from files_ch
+    path (data) 
 
     output:
-    files_ch
+    path (data) 
 
     script:
     """
-    echo "upload"
+    echo ${data}
     """
+}
+
+
+workflow {
+
+file_upload(files_ch)
+
 }
