@@ -1,6 +1,5 @@
 #!/usr/bin/env nextflow
-nextflow.enable.dsl=2
-
+//nextflow.enable.dsl=2
 
 log.info """\
 
@@ -14,14 +13,14 @@ files_ch = Channel
 
 
 process file_upload {
-    executor = "google-lifesciences"
-    publishDir "test/", mode: 'copy', pattern: "${data}"
+    //executor = 'google-lifesciences'
+    publishDir "gs://backup-case-mara/test", mode: 'copy', pattern: "${data}"
 
     input:
-    path (data) 
+    path(data) from files_ch
 
     output:
-    path (data) 
+    path(data) 
 
     script:
     """
@@ -30,8 +29,8 @@ process file_upload {
 }
 
 
-workflow {
+//workflow {
 
-file_upload(files_ch)
+//file_upload(files_ch)
 
-}
+//}
