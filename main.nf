@@ -1,5 +1,9 @@
 #!/usr/bin/env nextflow
-//nextflow.enable.dsl=2
+nextflow.enable.dsl=2
+
+/************************** 
+* LOG INFO
+**************************/
 
 log.info """\
 
@@ -8,29 +12,22 @@ log.info """\
  files        : ${params.files}
  """
 
+/************************** 
+* INPUTs
+**************************/
+
 files_ch = Channel
     .fromPath(params.files, checkIfExists: true)
 
+/************************** 
+* WORFLOW
+**************************/
+include { file_upload_wf } from './workflows/upload.nf'
 
-process file_upload {
-    //executor = 'google-lifesciences'
-    publishDir "gs://backup-case-mara/test", mode: 'copy', pattern: "${data}"
+/************************** 
+* MAIN WORKFLOW
+**************************/
 
-    input:
-    path(data) from files_ch
-
-    output:
-    path(data) 
-
-    script:
-    """
-    echo ${data}
-    """
+workflow {
+    file_upload_wf(files_ch) 
 }
-
-
-//workflow {
-
-//file_upload(files_ch)
-
-//}
