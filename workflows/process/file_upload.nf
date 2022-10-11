@@ -6,8 +6,8 @@ process file_upload {
     input:
     path(data) //from files_ch
 
-    //output:
-    //path ("${data}")
+    output:
+    path ("${data}")
 
     script:
     """
